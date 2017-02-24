@@ -40,12 +40,10 @@ RUN a2enmod rewrite \
     && wget https://github.com/bander2/twit/releases/download/1.1.0/twit-linux-amd64 -O /usr/local/bin/twit \
     && chmod u+x /usr/local/bin/twit
 
-RUN mkdir -p /var/www/drupal/web
-
 COPY config/000-default.conf /etc/apache2/sites-enabled/000-default.conf
 COPY config/dev.aliases.drushrc.php /root/.drush/dev.aliases.drushrc.php
 
-WORKDIR /var/www/drupal/web
+WORKDIR /var/www/drupal
 
 EXPOSE 80
 
