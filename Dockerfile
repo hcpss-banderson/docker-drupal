@@ -16,28 +16,43 @@ RUN apt-get update && apt-get install -y \
 		php-mbstring \
 		php-mcrypt \
 		php-xml \
+		php-apcu \
+		libyaml-dev \
+		php-dev \
+		php-pear \
+		php-sqlite3 \
 		mysql-client \
 		apache2 \
 		libapache2-mod-php \
 	&& apt-get clean
 
-COPY config/php.ini /usr/local/etc/php/
+RUN pecl install yaml-2.0.0
 
-# Install
-RUN a2enmod rewrite \
-	&& php -r "readfile('https://s3.amazonaws.com/files.drush.org/drush.phar');" > drush \
+COPY config/php.ini /usr/local/etc/php/
+COPY config/yaml.ini /etc/php/7.0/mods-available/yaml.ini
+RUN ln -s /etc/php/7.0/mods-available/yaml.ini /etc/php/7.0/cli/conf.d/20-yaml.ini
+
+RUN a2enmod rewrite
+
+# Drush
+RUN php -r "readfile('https://s3.amazonaws.com/files.drush.org/drush.phar');" > drush \
 	&& chmod +x drush \
 	&& mv drush /usr/local/bin \
-	&& drush init -y \
-	&& curl https://drupalconsole.com/installer -L -o drupal.phar \
+	&& drush init -y
+
+# Drupal
+RUN curl https://drupalconsole.com/installer -L -o drupal.phar \
 	&& mv drupal.phar /usr/local/bin/drupal \
-	&& chmod +x /usr/local/bin/drupal \
-	&& drupal init --override \
-	&& php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');" \
+	&& chmod +x /usr/local/bin/drupal
+
+# Composer
+RUN php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');" \
 	&& php composer-setup.php \
 	&& php -r "unlink('composer-setup.php');" \
-	&& mv composer.phar /usr/local/bin/composer \
-    && wget https://github.com/bander2/twit/releases/download/1.1.0/twit-linux-amd64 -O /usr/local/bin/twit \
+	&& mv composer.phar /usr/local/bin/composer
+
+# Twit
+RUN wget https://github.com/bander2/twit/releases/download/1.1.0/twit-linux-amd64 -O /usr/local/bin/twit \
     && chmod u+x /usr/local/bin/twit
 
 COPY config/000-default.conf /etc/apache2/sites-enabled/000-default.conf
