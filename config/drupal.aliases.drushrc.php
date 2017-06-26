@@ -1,8 +1,8 @@
 <?php
 
-$aliases['purchasing'] = array(
+$aliases['drupal'] = array(
   'root' => '/var/www/drupal/web',
-  'uri'  => 'purchasing.hcpss.dev',
+  'uri'  => 'localhost',
   'path-aliases' => array(
     '%dump-dir' => '/tmp',
   ),
