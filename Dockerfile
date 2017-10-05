@@ -23,7 +23,8 @@ RUN apt-get update && apt-get install -y \
 		mysql-client \
 		apache2 \
 		libapache2-mod-php \
-	&& apt-get clean
+	&& apt-get clean \
+	&& rm -rf /var/lib/apt/lists/*
 
 COPY config/php.ini /etc/php/7.0/apache/
 COPY config/php.ini /etc/php/7.0/cli/
