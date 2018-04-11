@@ -31,11 +31,11 @@ COPY config/php.ini /etc/php/7.0/cli/
 
 RUN a2enmod rewrite
 
-# Drush
-RUN php -r "readfile('https://s3.amazonaws.com/files.drush.org/drush.phar');" > drush \
-	&& chmod +x drush \
-	&& mv drush /usr/local/bin \
-	&& drush init -y
+# Drush Launcher
+RUN wget -O drush.phar https://github.com/drush-ops/drush-launcher/releases/download/0.6.0/drush.phar \
+	&& chmod +x drush.phar \
+	&& mv drush.phar /usr/local/bin/drush \
+	&& drush self-update
 
 # Drupal Composer
 RUN curl https://drupalconsole.com/installer -L -o drupal.phar \
