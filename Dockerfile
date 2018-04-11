@@ -26,7 +26,7 @@ RUN apt-get update && apt-get install -y \
 	&& apt-get clean \
 	&& rm -rf /var/lib/apt/lists/*
 
-COPY config/php.ini /etc/php/7.0/apache/
+COPY config/php.ini /etc/php/7.0/apache2/
 COPY config/php.ini /etc/php/7.0/cli/
 
 RUN a2enmod rewrite
