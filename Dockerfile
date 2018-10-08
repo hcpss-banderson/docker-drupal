@@ -4,6 +4,7 @@ RUN export DEBIAN_FRONTEND=noninteractive \
 	&& apt-get update && apt-get install -y --no-install-recommends \
 		git \
 		zip \
+		unzip \
 		xz-utils \
 		curl \
 		wget \
@@ -23,6 +24,9 @@ RUN export DEBIAN_FRONTEND=noninteractive \
 		mysql-client \
 		apache2 \
 		libapache2-mod-php \
+		php-zip \
+		openssl \
+		ca-certificates \
 	&& apt-get clean \
 	&& rm -rf /var/lib/apt/lists/*
 
