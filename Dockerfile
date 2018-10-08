@@ -1,6 +1,7 @@
-FROM ubuntu:xenial
+FROM ubuntu:bionic
 
-RUN apt-get update && apt-get install -y \
+RUN export DEBIAN_FRONTEND=noninteractive \
+	&& apt-get update && apt-get install -y --no-install-recommends \
 		git \
 		zip \
 		xz-utils \
@@ -14,7 +15,6 @@ RUN apt-get update && apt-get install -y \
 		php-json \
 		php-intl \
 		php-mbstring \
-		php-mcrypt \
 		php-xml \
 		php-apcu \
 		libyaml-dev \
@@ -26,24 +26,23 @@ RUN apt-get update && apt-get install -y \
 	&& apt-get clean \
 	&& rm -rf /var/lib/apt/lists/*
 
-COPY config/php.ini /etc/php/7.0/apache2/
-COPY config/php.ini /etc/php/7.0/cli/
+COPY config/php.ini /etc/php/7.2/apache2/
+COPY config/php.ini /etc/php/7.2/cli/
 
 RUN a2enmod rewrite
 
 # Drush Launcher
-RUN wget -O drush.phar https://github.com/drush-ops/drush-launcher/releases/download/0.6.0/drush.phar \
+RUN wget --no-check-certificate -O drush.phar https://github.com/drush-ops/drush-launcher/releases/download/0.6.0/drush.phar \
 	&& chmod +x drush.phar \
-	&& mv drush.phar /usr/local/bin/drush \
-	&& drush self-update
+	&& mv drush.phar /usr/local/bin/drush
 
 # Drupal Composer
-RUN curl https://drupalconsole.com/installer -L -o drupal.phar \
+RUN wget --no-check-certificate -O drupal.phar https://drupalconsole.com/installer \
 	&& mv drupal.phar /usr/local/bin/drupal \
 	&& chmod +x /usr/local/bin/drupal
 
 # Composer
-RUN php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');" \
+RUN php -r "copy('http://getcomposer.org/installer', 'composer-setup.php');" \
 	&& php composer-setup.php \
 	&& php -r "unlink('composer-setup.php');" \
 	&& mv composer.phar /usr/local/bin/composer
