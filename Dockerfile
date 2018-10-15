@@ -27,6 +27,7 @@ RUN export DEBIAN_FRONTEND=noninteractive \
 		php-zip \
 		openssl \
 		ca-certificates \
+		patch \
 	&& apt-get clean \
 	&& rm -rf /var/lib/apt/lists/*
 
