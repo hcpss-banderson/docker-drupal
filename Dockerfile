@@ -1,61 +1,92 @@
-FROM ubuntu:bionic
+FROM php:7.2-fpm-alpine
 
-RUN export DEBIAN_FRONTEND=noninteractive \
-	&& apt-get update && apt-get install -y --no-install-recommends \
-		git \
-		zip \
-		unzip \
-		xz-utils \
-		curl \
-		wget \
-		php \
-		php-cli \
-		php-curl \
-		php-gd \
-		php-mysql \
-		php-json \
-		php-intl \
-		php-mbstring \
-		php-xml \
-		php-apcu \
-		libyaml-dev \
-		php-dev \
-		php-sqlite3 \
-		mysql-client \
-		apache2 \
-		libapache2-mod-php \
-		php-zip \
-		openssl \
-		ca-certificates \
-	&& apt-get clean \
-	&& rm -rf /var/lib/apt/lists/*
+LABEL maintainer="Brendan Anderson <brendan_anderson@hcpss.org>"
 
-COPY config/php.ini /etc/php/7.2/apache2/
-COPY config/php.ini /etc/php/7.2/cli/
+# Configure PHP for running Drupal.
+RUN apk add --no-cache --virtual .php-run-deps \
+        libpng \
+        libjpeg-turbo \
+        freetype \
+        icu-dev \
+        zlib-dev \
+        libzip-dev \
+    && apk add --no-cache --virtual .php-build-deps \
+        freetype-dev \
+        libpng-dev \
+        libjpeg-turbo-dev \
+    && docker-php-ext-configure gd \
+        --with-gd \
+        --with-freetype-dir=/usr/include/ \
+        --with-png-dir=/usr/include/ \
+        --with-jpeg-dir=/usr/include/ \
+    && docker-php-ext-configure zip --with-libzip \
+    && NPROC=$(getconf _NPROCESSORS_ONLN) \
+    && docker-php-ext-install -j${NPROC} gd mysqli pdo pdo_mysql intl opcache zip \
+    && apk del .php-build-deps
 
-RUN a2enmod rewrite
+# Configure the system for Composer
+ENV COMPOSER_ALLOW_SUPERUSER 1
+RUN apk --no-cache add --virtual .composer-rundeps \
+    git \
+    subversion \
+    openssh \
+    mercurial \
+    tini \
+    bash \
+    patch \
+    make \
+    zip \
+    unzip
+
+# Configure PHP for Composer
+RUN echo "memory_limit=-1" > "$PHP_INI_DIR/conf.d/memory-limit.ini" \
+    && echo "date.timezone=${PHP_TIMEZONE:-UTC}" > "$PHP_INI_DIR/conf.d/date_timezone.ini" \
+    && apk add --no-cache --virtual .composer-build-deps zlib-dev libzip-dev \
+    && docker-php-ext-configure zip --with-libzip \
+    && docker-php-ext-install -j$(getconf _NPROCESSORS_ONLN) zip \
+    && apk del .composer-build-deps
+
+# Install Composer
+RUN EXPECTED_SIGNATURE="$(wget -q -O - https://composer.github.io/installer.sig)" \
+    && php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');" \
+    && ACTUAL_SIGNATURE="$(php -r "echo hash_file('sha384', 'composer-setup.php');")" \
+    && if [ "$EXPECTED_SIGNATURE" != "$ACTUAL_SIGNATURE" ]; \
+    then \
+        >&2 echo 'ERROR: Invalid installer signature'; \
+        rm composer-setup.php; \
+        exit 1; \
+    fi \
+    && php composer-setup.php --quiet \
+    && rm composer-setup.php \
+    && mv composer.phar /usr/local/bin/composer
 
 # Drush Launcher
 RUN wget --no-check-certificate -O drush.phar https://github.com/drush-ops/drush-launcher/releases/download/0.6.0/drush.phar \
 	&& chmod +x drush.phar \
-	&& mv drush.phar /usr/local/bin/drush
+    && mv drush.phar /usr/local/bin/drush
 
-# Drupal Composer
-RUN wget --no-check-certificate -O drupal.phar https://drupalconsole.com/installer \
-	&& mv drupal.phar /usr/local/bin/drupal \
-	&& chmod +x /usr/local/bin/drupal
+RUN cp $PHP_INI_DIR/php.ini-production $PHP_INI_DIR/php.ini
 
-# Composer
-RUN php -r "copy('http://getcomposer.org/installer', 'composer-setup.php');" \
-	&& php composer-setup.php \
-	&& php -r "unlink('composer-setup.php');" \
-	&& mv composer.phar /usr/local/bin/composer
+RUN mkdir -p /var/www/drupal
 
-COPY config/000-default.conf /etc/apache2/sites-enabled/000-default.conf
-COPY config/drupal.aliases.drushrc.php /root/.drush/drupal.aliases.drushrc.php
+VOLUME ["/var/www/drupal"]
 
 WORKDIR /var/www/drupal
 
-EXPOSE 80
+ONBUILD COPY drupal/web/autoload.php               /var/www/drupal/web/autoload.php
+ONBUILD COPY drupal/web/modules/custom             /var/www/drupal/web/modules/custom
+ONBUILD COPY drupal/web/themes/custom              /var/www/drupal/web/themes/custom
+ONBUILD COPY drupal/scripts                        /var/www/drupal/scripts
+ONBUILD COPY drupal/drush                          /var/www/drupal/drush
+ONBUILD COPY drupal/composer.json                  /var/www/drupal/composer.json
+ONBUILD COPY drupal/composer.lock                  /var/www/drupal/composer.lock
+ONBUILD COPY drupal/config                         /var/www/drupal/config
+ONBUILD COPY drupal/web/sites/default/settings.php /var/www/drupal/web/sites/default/settings.php
 
-CMD ["/usr/sbin/apache2ctl", "-D", "FOREGROUND"]
+ONBUILD RUN composer install
+
+COPY entrypoint.sh /entrypoint.sh
+
+ENTRYPOINT ["/entrypoint.sh"]
+
+CMD ["php-fpm"]
