@@ -31,8 +31,8 @@ RUN export DEBIAN_FRONTEND=noninteractive \
 	&& apt-get clean \
 	&& rm -rf /var/lib/apt/lists/*
 
-COPY config/php.ini /etc/php/7.2/apache2/
-COPY config/php.ini /etc/php/7.2/cli/
+COPY config/php.apache.ini /etc/php/7.2/apache2/php.ini
+COPY config/php.cli.ini /etc/php/7.2/cli/php.ini
 
 RUN a2enmod rewrite
 
