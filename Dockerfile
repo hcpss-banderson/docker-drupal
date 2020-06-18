@@ -1,4 +1,4 @@
-FROM ubuntu:bionic
+FROM ubuntu:focal
 
 RUN export DEBIAN_FRONTEND=noninteractive \
 	&& apt-get update && apt-get install -y --no-install-recommends \
