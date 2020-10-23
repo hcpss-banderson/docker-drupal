@@ -41,10 +41,10 @@ RUN wget --no-check-certificate -O drush.phar https://github.com/drush-ops/drush
 	&& chmod +x drush.phar \
 	&& mv drush.phar /usr/local/bin/drush
 
-# Drupal Composer
-RUN wget --no-check-certificate -O drupal.phar https://drupalconsole.com/installer \
-	&& mv drupal.phar /usr/local/bin/drupal \
-	&& chmod +x /usr/local/bin/drupal
+# Drupal Console
+#RUN wget --no-check-certificate -O drupal.phar https://drupalconsole.com/installer \
+#	&& mv drupal.phar /usr/local/bin/drupal \
+#	&& chmod +x /usr/local/bin/drupal
 
 # Composer
 RUN php -r "copy('http://getcomposer.org/installer', 'composer-setup.php');" \
