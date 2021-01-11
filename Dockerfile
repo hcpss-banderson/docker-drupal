@@ -9,6 +9,7 @@ RUN install-php-extensions \
     intl \
     apcu \
     zip \
+    opcache \
     @composer \
   && cp /usr/local/etc/php/php.ini-production /usr/local/etc/php/php.ini
     
