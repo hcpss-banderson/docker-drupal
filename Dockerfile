@@ -1,4 +1,4 @@
-FROM php:7.4.14-apache-buster
+FROM php:7.4-apache-buster
 
 COPY --from=mlocati/php-extension-installer /usr/bin/install-php-extensions /usr/local/bin/
 
