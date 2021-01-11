@@ -5,27 +5,27 @@ COPY --from=mlocati/php-extension-installer /usr/bin/install-php-extensions /usr
 RUN install-php-extensions \
     gd \
     xdebug \
-    mysqli \
+    pdo_mysql \
     intl \
     apcu \
     zip \
     @composer \
   && cp /usr/local/etc/php/php.ini-production /usr/local/etc/php/php.ini
-
+    
 RUN export DEBIAN_FRONTEND=noninteractive \
-	&& apt-get update && apt-get install -y --no-install-recommends \
-		git \
-		zip \
-		unzip \
-		xz-utils \
-		curl \
-		wget \
-		default-mysql-client \
-		openssl \
-		ca-certificates \
-		patch \
-	&& apt-get clean \
-	&& rm -rf /var/lib/apt/lists/*
+  && apt-get update && apt-get install -y --no-install-recommends \
+    git \
+    zip \
+    unzip \
+    xz-utils \
+    curl \
+    wget \
+    default-mysql-client \
+    openssl \
+    ca-certificates \
+    patch \
+  && apt-get clean \
+  && rm -rf /var/lib/apt/lists/*
 
 RUN a2enmod rewrite
 
