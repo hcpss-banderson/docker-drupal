@@ -4,7 +4,6 @@ COPY --from=mlocati/php-extension-installer /usr/bin/install-php-extensions /usr
 
 RUN install-php-extensions \
     gd \
-    xdebug \
     pdo_mysql \
     intl \
     apcu \
