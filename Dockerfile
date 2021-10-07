@@ -27,8 +27,6 @@ RUN export DEBIAN_FRONTEND=noninteractive \
   && apt-get clean \
   && rm -rf /var/lib/apt/lists/*
 
-RUN a2enmod rewrite
-
 # Global Drush
 RUN composer global require consolidation/cgr
 ENV PATH="/root/.composer/vendor/bin:$PATH"
