@@ -28,9 +28,8 @@ RUN export DEBIAN_FRONTEND=noninteractive \
   && rm -rf /var/lib/apt/lists/*
 
 # Global Drush
-RUN composer global require consolidation/cgr
+RUN composer global require drush/drush
 ENV PATH="/root/.composer/vendor/bin:$PATH"
-RUN cgr drush/drush
 
 # Drupal Console
 RUN curl https://drupalconsole.com/installer -L -o drupal.phar \
