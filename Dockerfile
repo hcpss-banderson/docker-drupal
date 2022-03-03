@@ -1,4 +1,4 @@
-FROM php:7.4-apache-buster
+FROM php:8.1-apache-buster
 
 COPY --from=mlocati/php-extension-installer /usr/bin/install-php-extensions /usr/local/bin/
 
@@ -30,9 +30,9 @@ RUN export DEBIAN_FRONTEND=noninteractive \
 RUN a2enmod rewrite
 
 # Global Drush
-RUN composer global require consolidation/cgr
-ENV PATH="/root/.composer/vendor/bin:$PATH"
-RUN cgr drush/drush
+RUN wget -O drush.phar https://github.com/drush-ops/drush-launcher/releases/latest/download/drush.phar \
+  && chmod +x drush.phar \
+  && mv drush.phar /usr/local/bin/drush
 
 # Drupal Console
 RUN curl https://drupalconsole.com/installer -L -o drupal.phar \
