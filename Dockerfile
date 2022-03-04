@@ -34,11 +34,6 @@ RUN wget -O drush.phar https://github.com/drush-ops/drush-launcher/releases/late
   && chmod +x drush.phar \
   && mv drush.phar /usr/local/bin/drush
 
-# Drupal Console
-RUN curl https://drupalconsole.com/installer -L -o drupal.phar \
-  && mv drupal.phar /usr/local/bin/drupal \
-  && chmod +x /usr/local/bin/drupal
-
 COPY config/000-default.conf /etc/apache2/sites-enabled/000-default.conf
 
 RUN mkdir -p /var/www/drupal
