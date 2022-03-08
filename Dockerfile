@@ -9,6 +9,7 @@ RUN install-php-extensions \
     apcu \
     zip \
     opcache \
+    uploadprogress \
     @composer \
   && cp /usr/local/etc/php/php.ini-production /usr/local/etc/php/php.ini
 
