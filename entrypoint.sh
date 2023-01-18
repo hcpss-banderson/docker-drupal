@@ -4,15 +4,17 @@ set -e
 
 if [ ! -d /var/www/drupal/files ]; then
     mkdir -p /var/www/drupal/files
+    chown -R www-data:www-data /var/www/drupal/files
 fi
 
 if [ ! -d /var/www/drupal/web/sites/default/files ]; then
     mkdir -p /var/www/drupal/web/sites/default/files
+    chown -R www-data:www-data /var/www/drupal/web/sites/default/files
 fi
 
-chown -R www-data:www-data /var/www/drupal/files
-chown -R www-data:www-data /var/www/drupal/config
-chown -R www-data:www-data /var/www/drupal/web/sites/default/files
+#chown -R www-data:www-data /var/www/drupal/files
+#chown -R www-data:www-data /var/www/drupal/config
+#chown -R www-data:www-data /var/www/drupal/web/sites/default/files
 
 chown root:root /var/www/drupal/web/sites/default/settings.php
 chmod 444 /var/www/drupal/web/sites/default/settings.php
