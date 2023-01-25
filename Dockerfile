@@ -3,6 +3,7 @@ FROM php:8.0-apache-buster
 COPY --from=mlocati/php-extension-installer /usr/bin/install-php-extensions /usr/local/bin/
 
 RUN install-php-extensions \
+    bcmath \
     gd \
     pdo_mysql \
     intl \
