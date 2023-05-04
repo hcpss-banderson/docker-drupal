@@ -1,4 +1,4 @@
-FROM php:8.0-apache-buster
+FROM php:8.1-apache-buster
 
 COPY --from=mlocati/php-extension-installer /usr/bin/install-php-extensions /usr/local/bin/
 
@@ -10,6 +10,7 @@ RUN install-php-extensions \
     apcu \
     zip \
     opcache \
+    imap \
     uploadprogress \
     @composer \
   && cp /usr/local/etc/php/php.ini-production /usr/local/etc/php/php.ini
@@ -48,8 +49,6 @@ ONBUILD COPY drupal/composer.json                  /var/www/drupal/composer.json
 ONBUILD COPY drupal/composer.lock                  /var/www/drupal/composer.lock
 ONBUILD COPY drupal/config                         /var/www/drupal/config
 ONBUILD COPY drupal/web/sites/default/settings.php /var/www/drupal/web/sites/default/settings.php
-
-ONBUILD RUN composer install -d /var/www/drupal
 
 COPY entrypoint.sh /entrypoint.sh
 ONBUILD ENTRYPOINT ["/entrypoint.sh"]
