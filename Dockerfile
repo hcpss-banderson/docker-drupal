@@ -1,4 +1,4 @@
-FROM php:8.1-apache-buster
+FROM php:8.2-apache-buster
 
 ENV PATH="${PATH}:/var/www/drupal/vendor/bin"
 
