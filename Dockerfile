@@ -1,5 +1,7 @@
 FROM php:8.1-apache-buster
 
+ENV PATH="${PATH}:/var/www/drupal/vendor/bin"
+
 COPY --from=mlocati/php-extension-installer /usr/bin/install-php-extensions /usr/local/bin/
 
 RUN install-php-extensions \
@@ -31,11 +33,6 @@ RUN export DEBIAN_FRONTEND=noninteractive \
   && rm -rf /var/lib/apt/lists/*
 
 RUN a2enmod rewrite
-
-# Global Drush
-RUN wget -O drush.phar https://github.com/drush-ops/drush-launcher/releases/latest/download/drush.phar \
-  && chmod +x drush.phar \
-  && mv drush.phar /usr/local/bin/drush
 
 COPY config/000-default.conf /etc/apache2/sites-enabled/000-default.conf
 
