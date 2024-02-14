@@ -1,6 +1,7 @@
 FROM php:8.2-apache-buster
 
 ENV PATH="${PATH}:/var/www/drupal/vendor/bin"
+ENV COMPOSER_ALLOW_SUPERUSER=1
 
 COPY --from=mlocati/php-extension-installer /usr/bin/install-php-extensions /usr/local/bin/
 
