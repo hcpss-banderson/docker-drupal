@@ -39,16 +39,6 @@ COPY config/000-default.conf /etc/apache2/sites-enabled/000-default.conf
 RUN mkdir -p /var/www/drupal
 WORKDIR /var/www/drupal
 
-# Create the Drupal structure
-ONBUILD COPY drupal/web/modules/custom             /var/www/drupal/web/modules/custom
-ONBUILD COPY drupal/web/themes/custom              /var/www/drupal/web/themes/custom
-ONBUILD COPY drupal/composer.json                  /var/www/drupal/composer.json
-ONBUILD COPY drupal/composer.lock                  /var/www/drupal/composer.lock
-ONBUILD COPY drupal/config                         /var/www/drupal/config
-ONBUILD COPY drupal/web/sites/default/settings.php /var/www/drupal/web/sites/default/settings.php
-
 COPY entrypoint.sh /entrypoint.sh
-ONBUILD ENTRYPOINT ["/entrypoint.sh"]
 
 EXPOSE 80
-ONBUILD CMD ["apache2-foreground"]
