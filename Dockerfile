@@ -1,4 +1,5 @@
-FROM php:8.1-apache-buster
+ARG PHPVERSION=8.2
+FROM --platform=$BUILDPLATFORM php:$PHPVERSION-apache-bookworm
 
 ENV PATH="${PATH}:/var/www/drupal/vendor/bin"
 ENV COMPOSER_ALLOW_SUPERUSER=1
