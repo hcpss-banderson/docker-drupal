@@ -1,5 +1,5 @@
 ARG PHPVERSION=8.2
-FROM --platform=$BUILDPLATFORM php:$PHPVERSION-apache-bookworm
+FROM --platform=$BUILDPLATFORM php:$PHPVERSION-apache-bookworm as base
 
 ENV PATH="${PATH}:/var/www/drupal/vendor/bin"
 ENV COMPOSER_ALLOW_SUPERUSER=1
@@ -41,6 +41,15 @@ COPY config/000-default.conf /etc/apache2/sites-enabled/000-default.conf
 RUN mkdir -p /var/www/drupal
 WORKDIR /var/www/drupal
 
+EXPOSE 80
+
+COPY entrypoint.sh /entrypoint.sh
+
+ENTRYPOINT ["/entrypoint.sh"]
+CMD ["apache2-foreground"]
+
+FROM base as build
+
 # Create the Drupal structure
 ONBUILD COPY drupal/web/modules/custom             /var/www/drupal/web/modules/custom
 ONBUILD COPY drupal/web/themes/custom              /var/www/drupal/web/themes/custom
@@ -49,8 +58,5 @@ ONBUILD COPY drupal/composer.lock                  /var/www/drupal/composer.lock
 ONBUILD COPY drupal/config                         /var/www/drupal/config
 ONBUILD COPY drupal/web/sites/default/settings.php /var/www/drupal/web/sites/default/settings.php
 
-COPY entrypoint.sh /entrypoint.sh
 ONBUILD ENTRYPOINT ["/entrypoint.sh"]
-
-EXPOSE 80
 ONBUILD CMD ["apache2-foreground"]
