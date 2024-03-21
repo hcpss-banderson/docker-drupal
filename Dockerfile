@@ -1,8 +1,30 @@
 ARG PHPVERSION=8.2
-FROM --platform=$BUILDPLATFORM php:$PHPVERSION-apache-bookworm as base
+FROM php:$PHPVERSION-apache-bookworm as base
 
 ENV PATH="${PATH}:/var/www/drupal/vendor/bin"
 ENV COMPOSER_ALLOW_SUPERUSER=1
+
+# RUN apt-get update && apt-get install -y \
+# 		libfreetype-dev \
+# 		libjpeg62-turbo-dev \
+# 		libpng-dev \
+#     && docker-php-ext-configure gd --with-freetype --with-jpeg \
+#     && docker-php-ext-install -j$(nproc) gd
+
+# ADD --chmod=0755 https://github.com/mlocati/docker-php-extension-installer/releases/latest/download/install-php-extensions /usr/local/bin/
+
+# RUN chmod +x /usr/local/bin/install-php-extensions
+# RUN install-php-extensions bcmath
+# RUN install-php-extensions gd
+# RUN install-php-extensions pdo_mysql
+# RUN install-php-extensions intl
+# RUN install-php-extensions apcu
+# RUN install-php-extensions zip
+# RUN install-php-extensions opcache
+# RUN install-php-extensions imap
+# RUN install-php-extensions uploadprogress
+# RUN install-php-extensions @composer
+# RUN cp /usr/local/etc/php/php.ini-production /usr/local/etc/php/php.ini
 
 COPY --from=mlocati/php-extension-installer /usr/bin/install-php-extensions /usr/local/bin/
 
