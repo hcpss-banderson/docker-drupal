@@ -9,8 +9,9 @@ RUN install-php-extensions \
     apcu \
     zip \
     opcache \
-    @composer \
-  && cp /usr/local/etc/php/php.ini-production /usr/local/etc/php/php.ini
+    @composer
+
+RUN cp /usr/local/etc/php/php.ini-production /usr/local/etc/php/php.ini
 
 RUN export DEBIAN_FRONTEND=noninteractive \
   && apt-get update && apt-get install -y --no-install-recommends \
@@ -35,6 +36,7 @@ ENV PATH="/root/.composer/vendor/bin:$PATH"
 RUN cgr drush/drush 8.*
 
 COPY config/000-default.conf /etc/apache2/sites-enabled/000-default.conf
+COPY wait-for-db.sh /wait-for-db.sh
 
 RUN mkdir -p /var/www/drupal
 WORKDIR /var/www/drupal
