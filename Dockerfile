@@ -1,10 +1,10 @@
 ARG PHPVERSION=8.2
-FROM php:$PHPVERSION-apache-bookworm as base
+FROM php:$PHPVERSION-apache-bookworm AS base
 
 ENV PATH="${PATH}:/var/www/drupal/vendor/bin"
 ENV COMPOSER_ALLOW_SUPERUSER=1
 
-COPY --from=mlocati/php-extension-installer /usr/bin/install-php-extensions /usr/local/bin/
+ADD --chmod=0755 https://github.com/mlocati/docker-php-extension-installer/releases/latest/download/install-php-extensions /usr/local/bin/
 
 RUN install-php-extensions \
     bcmath \
@@ -48,15 +48,15 @@ COPY entrypoint.sh /entrypoint.sh
 ENTRYPOINT ["/entrypoint.sh"]
 CMD ["apache2-foreground"]
 
-FROM base as build
+FROM base AS build
 
 # Create the Drupal structure
-ONBUILD COPY drupal/web/modules/custom             /var/www/drupal/web/modules/custom
-ONBUILD COPY drupal/web/themes/custom              /var/www/drupal/web/themes/custom
-ONBUILD COPY drupal/composer.json                  /var/www/drupal/composer.json
-ONBUILD COPY drupal/composer.lock                  /var/www/drupal/composer.lock
-ONBUILD COPY drupal/config                         /var/www/drupal/config
-ONBUILD COPY drupal/web/sites/default/settings.php /var/www/drupal/web/sites/default/settings.php
+ONBUILD COPY --chown=root:www-data --chmod=640 drupal/web/modules/custom             /var/www/drupal/web/modules/custom
+ONBUILD COPY --chown=root:www-data --chmod=640 drupal/web/themes/custom              /var/www/drupal/web/themes/custom
+ONBUILD COPY --chown=root:www-data --chmod=640 drupal/composer.json                  /var/www/drupal/composer.json
+ONBUILD COPY --chown=root:www-data --chmod=640 drupal/composer.lock                  /var/www/drupal/composer.lock
+ONBUILD COPY --chown=root:www-data --chmod=640 drupal/config                         /var/www/drupal/config
+ONBUILD COPY --chown=root:www-data --chmod=640 drupal/web/sites/default/settings.php /var/www/drupal/web/sites/default/settings.php
 
 ONBUILD ENTRYPOINT ["/entrypoint.sh"]
 ONBUILD CMD ["apache2-foreground"]
