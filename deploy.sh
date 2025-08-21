@@ -4,6 +4,7 @@ docker buildx create --use --name drupal_builder
 
 VERSIONS=( "8.3" "8.4" )
 for VERSION in "${VERSIONS[@]}"; do
+    echo "VERSION NUMBER ${VERSION}"
     docker buildx build \
         --build-arg PHPVERSION=${VERSION} \
         --target base \

@@ -34,6 +34,13 @@ RUN export DEBIAN_FRONTEND=noninteractive \
   && apt-get clean \
   && rm -rf /var/lib/apt/lists/*
 
+RUN wget https://github.com/Metadrop/drupal-fix-permissions-script/archive/refs/tags/v1.0.1.tar.gz \
+  && tar -xzf v1.0.1.tar.gz \
+  && rm v1.0.1.tar.gz \
+  && mv drupal-fix-permissions-script-1.0.1/autofix-drupal-perms.sh /usr/local/bin/autofix-drupal-perms.sh \
+  && mv drupal-fix-permissions-script-1.0.1/drupal_fix_permissions.sh /usr/local/bin/drupal_fix_permissions.sh
+
+
 RUN a2enmod rewrite
 
 COPY config/000-default.conf /etc/apache2/sites-enabled/000-default.conf
