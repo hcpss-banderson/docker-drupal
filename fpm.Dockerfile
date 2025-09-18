@@ -1,23 +1,22 @@
 ARG PHPVERSION=8.3
-FROM php:$PHPVERSION-apache-bookworm
+FROM php:$PHPVERSION-fpm
 
-ENV PATH="${PATH}:/var/www/drupal/vendor/bin"
 ENV COMPOSER_ALLOW_SUPERUSER=1
 
 ADD --chmod=0755 https://github.com/mlocati/docker-php-extension-installer/releases/latest/download/install-php-extensions /usr/local/bin/
 
 RUN install-php-extensions \
-    bcmath \
-    gd \
-    pdo_mysql \
-    intl \
     apcu \
-    zip \
+    gd \
     opcache \
+    pdo_mysql \
+    zip \
+    bcmath \
+    intl \
     imap \
-    uploadprogress \
-    @composer \
-  && cp /usr/local/etc/php/php.ini-production /usr/local/etc/php/php.ini
+    uploadprogress
+
+COPY --from=composer/composer:2-bin /composer /usr/local/bin/
 
 RUN export DEBIAN_FRONTEND=noninteractive \
   && apt-get update && apt-get install -y --no-install-recommends \
@@ -40,17 +39,5 @@ RUN wget https://github.com/Metadrop/drupal-fix-permissions-script/archive/refs/
   && mv drupal-fix-permissions-script-1.0.1/autofix-drupal-perms.sh /usr/local/bin/autofix-drupal-perms.sh \
   && mv drupal-fix-permissions-script-1.0.1/drupal_fix_permissions.sh /usr/local/bin/drupal_fix_permissions.sh
 
-
-RUN a2enmod rewrite
-
-COPY config/000-default.conf /etc/apache2/sites-enabled/000-default.conf
-
-RUN mkdir -p /var/www/drupal
 WORKDIR /var/www/drupal
-
-EXPOSE 80
-
-COPY entrypoint.sh /entrypoint.sh
-
-ENTRYPOINT ["/entrypoint.sh"]
-CMD ["apache2-foreground"]
+ENV PATH=${PATH}:/var/www/drupal/vendor/bin
