@@ -1,0 +1,48 @@
+name: Build and Deploy
+on:
+    workflow_dispatch:
+        inputs:
+            php_version:
+                description: 'PHP Version'
+                required: true
+                default: '8.4.28'
+jobs:
+    build:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v3
+            - name: Set up Docker Buildx
+              uses: docker/setup-buildx-action@v2
+            - name: Log in to DockerHub
+              uses: docker/login-action@v2
+              with:
+                username: ${{ vars.DOCKER_USERNAME }}
+                password: ${{ secrets.DOCKER_PASSWORD }}
+            - name: Build and push PHP-FPM Docker image
+              uses: docker/build-push-action@v7
+              with:
+                context: .
+                file: php-fpm/Dockerfile
+                platforms: linux/amd64,linux/arm64
+                push: true
+                build-args: |
+                    PHPVERSION=${{ inputs.php_version }}
+                tags: |
+                    banderson/drupal:${{ inputs.php_version }}-fpm
+                cache-from: type=gha
+                cache-to: type=gha,mode=max
+            - name: Build and push PHP apache Docker image
+              uses: docker/build-push-action@v7
+              with:
+                context: .
+                file: mod_php/Dockerfile
+                platforms: linux/amd64,linux/arm64
+                push: true
+                build-args: |
+                    PHPVERSION=${{ inputs.php_version }}
+                tags: |
+                    banderson/drupal:${{ inputs.php_version }}
+                    banderson/drupal:${{ inputs.php_version }}-apache
+                cache-from: type=gha
+                cache-to: type=gha,mode=max
